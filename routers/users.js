@@ -10,6 +10,12 @@ const {
   schemas,
 } = require("../helpers/user.validate");
 
+
+
+router
+  .route("/GetUserAfterLogin")
+  .get(verifyAccessToken, UserController.GetUserAfterLogin);
+
 router
   .route("/")
   .get(verifyAccessToken, UserController.index)
@@ -69,5 +75,9 @@ router.route("/sendOtp").post(UserController.sendOTP);
 router.route("/verifyOtpSignUp").post(UserController.verifyOTPSignUp);
 
 router.route("/forgotPassword").post(UserController.forgotPassword);
+
+router.route("/checkPhone").post(UserController.checkPhone);
+
+
 
 module.exports = router;

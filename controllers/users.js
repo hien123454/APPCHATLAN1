@@ -110,7 +110,6 @@ const signUp = async (req, res, next) => {
       phone,
       password: newPassword,
     });
-
     return res.status(201).json({ success: true, newUser });
   } catch (error) {
     next(error);
@@ -365,6 +364,30 @@ const verifyOTPSignUp = async (req, res, next) => {
     next(error);
   }
 };
+const GetUserAfterLogin = async (req, res, next) => {
+  try {
+    const foundUser = await User.findOne({ _id: req.payload.userId });
+    if (!foundUser){
+      return res
+      .status(403)
+      .json({ error: { message: "User was not login!!!" } });
+    }
+      res.status(200).send({foundUser});
+  } catch (error) {
+    next(error);
+  }
+};
+const checkPhone = async (req, res, next) => {
+  try {
+    const {phone} = req.body
+    const foundPhone = await User.findOne({ phone });
+    if(foundPhone)
+      return res.status(403).json({ error: { message: "Số điện thoại đã được sử dụng." } })
+    return res.status(201).json({ success: true});
+  } catch (error) {
+    next(error)
+  }
+}
 module.exports = {
   index,
   newUser,
@@ -383,4 +406,6 @@ module.exports = {
   forgotPassword,
   sendOTP,
   verifyOTPSignUp,
+  GetUserAfterLogin,
+  checkPhone
 };
