@@ -22,14 +22,9 @@ const newUser = async (req, res, next) => {
 };
 const getUser = async (req, res, next) => {
   try {
-    const id = req.params.userId;
-    const users = await User.findById({ _id: id }).populate("username");
-    //const friend = await FriendRequest.findById(save.id).populate('receiver')
-
-    const chunkData = {
-      id: users.id,
-      user: FilterUserData(users.username),
-    };
+    const id = req.params.userID;
+    console.log("Hien nEk",id );
+    const users = await User.findById({ _id: id })
     res.status(200).json({ users });
   } catch (error) {
     next(error);
@@ -37,7 +32,7 @@ const getUser = async (req, res, next) => {
 };
 const updateUser = async (req, res, next) => {
   try {
-    const id = req.params.userId;
+    const id = req.params.userID;
     const newUser = req.body;
     const result = await User.findByIdAndUpdate(id, newUser);
     return res.status(200).json({ success: true });
@@ -47,7 +42,7 @@ const updateUser = async (req, res, next) => {
 };
 const replaceUser = async (req, res, next) => {
   try {
-    const id = req.params.userId;
+    const id = req.params.userID;
     const newUser = req.body;
     const result = await User.findByIdAndUpdate(id, newUser);
     return res.status(200).json({ success: true });
