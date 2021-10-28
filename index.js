@@ -4,9 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const app = express();
-const http = require("http");
-const server = http.createServer(app);
-const io = require("socket.io")(server);
+const server = require('http').createServer(app);
+const io =require("socket.io")(server);
 
 const PORT = process.env.PORT || 3000;
 const db = require("./config/db");
@@ -16,6 +15,11 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+server.listen(PORT, () => {
+  console.log(`Server on in port : ${PORT}`);
+});
+
 app.use((req, res, next) => {
   io.req = req;
   req.io = io;
@@ -25,6 +29,7 @@ app.use((req, res, next) => {
 app.use("/", IndexRouter);
 
 require("./socket")(io);
+
 // Catch 404 Errors and forward them to error handler
 app.use((req, res, next) => {
   const err = new Error("Not Found");
@@ -43,6 +48,4 @@ app.use((err, req, res, next) => {
     },
   });
 });
-app.listen(PORT, () => {
-  console.log(`Server on in port : ${PORT}`);
-});
+

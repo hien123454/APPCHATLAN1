@@ -2,10 +2,11 @@ const User = require("./models/User");
 
 module.exports = (io) => {
   io.on("connection", (socket) => {
+    console.log("a user connected.");
     if (io.req) {
       socket.broadcast.emit("friend-login-status", { user_id: io.req.userId });
       addSocketIdInDB(socket.id, io.req.userId);
-
+      
       socket.on("disconnect", () => {
         socket.broadcast.emit("friend-logout-status", {
           user_id: io.req.userId,
