@@ -39,7 +39,25 @@ const getListRoom = async (req, res, next) => {
         next(err)
       }
 }
+const getRoom = async (req, res, next) => {
+  try {
+      const foundUser = await User.findOne({ _id: req.payload.userId });
+      if (!foundUser){
+        return res
+        .status(403)
+        .json({ error: { message: "User was not login!!!" } });
+      }
+      const roomId = req.body.roomId;
+      const Room = await Rooms.findOne({
+        _id: roomId,
+      });
+      res.status(200).json(Room);
+    } catch (err) {
+      next(err)
+    }
+}
 
 module.exports = {
     addRoom,
+    getRoom,
     getListRoom}
