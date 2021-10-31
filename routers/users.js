@@ -11,8 +11,28 @@ const {
 } = require("../helpers/user.validate");
 
 router
+  .route("/GetUserAfterLogin")
+  .get(verifyAccessToken, UserController.GetUserAfterLogin);
+
+router
+  .route("/cancelSendedFriend")
+  .post(verifyAccessToken, UserController.cancelSendedFriend);
+
+router
+  .route("/requestAddFriend")
+  .post(verifyAccessToken, UserController.requestAddFriend);
+
+router
+  .route("/acceptFriend")
+  .post(verifyAccessToken, UserController.acceptFriend);
+
+router
+  .route("/declineFriend")
+  .post(verifyAccessToken, UserController.declineFriend);
+
+router
   .route("/:userID")
-  .get( UserController.getUser)
+  .get(validateParam(schemas.idSchema, "userID"), UserController.getUser)
   .put(
     validateParam(schemas.idSchema, "userID"),
     validateBody(schemas.userSchema),
@@ -22,32 +42,12 @@ router
     validateParam(schemas.idSchema, "userID"),
     validateBody(schemas.userOptionalSchema),
     UserController.updateUser
-  );
-
-router
-  .route("/GetUserAfterLogin")
-  .get(verifyAccessToken, UserController.GetUserAfterLogin);
+  )
+  .delete(validateParam(schemas.idSchema, "userID"), UserController.deleteUser);
 
 router
   .route("/")
-  .get(verifyAccessToken, UserController.index)
+  .get(verifyAccessToken, UserController.getAllUser)
   .post(validateBody(schemas.userSchema), UserController.newUser);
-  
-
-router
-  .route("/requestAddFriend")
-  .post(verifyAccessToken, UserController.requestAddFriend);
-
-router
-  .route("/cancelSendedFriend")
-  .post(verifyAccessToken, UserController.cancelSendedFriend);
-
-router
-  .route("/acceptFriend")
-  .post(verifyAccessToken, UserController.acceptFriend);
-
-router
-  .route("/declineFriend")
-  .post(verifyAccessToken, UserController.declineFriend);
 
 module.exports = router;

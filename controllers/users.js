@@ -3,7 +3,7 @@ const UserRequest = require("../models/UserRequest");
 const Rooms = require("../models/Rooms");
 const FilterUserData = require("../utils/FilterUserData");
 
-const index = async (req, res, next) => {
+const getAllUser = async (req, res, next) => {
   try {
     const users = await User.find({});
     res.status(200).json({ users });
@@ -45,6 +45,15 @@ const replaceUser = async (req, res, next) => {
     const id = req.params.userID;
     const newUser = req.body;
     const result = await User.findByIdAndUpdate(id, newUser);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+const deleteUser = async (req, res, next) => {
+  try {
+    const id = req.params.userID;
+    await User.deleteOne({_id :id});
     return res.status(200).json({ success: true });
   } catch (error) {
     next(error);
@@ -170,11 +179,12 @@ const GetUserAfterLogin = async (req, res, next) => {
   }
 };
 module.exports = {
-  index,
+  getAllUser,
   newUser,
   getUser,
   updateUser,
   replaceUser,
+  deleteUser,
   requestAddFriend,
   cancelSendedFriend,
   acceptFriend,

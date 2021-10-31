@@ -8,7 +8,7 @@ const MessageController = require("../controllers/message");
 
 router.post("/addMessage",verifyAccessToken,MessageController.addMessage);
 
-router.get("/cancelMessage",verifyAccessToken,MessageController.cancelMessage);
+router.put("/cancelMessage/:messageId",verifyAccessToken,MessageController.cancelMessage);
 //get
-router.get("/getMessage",verifyAccessToken,MessageController.getMessage);
+router.get("/:RoomID",verifyAccessToken,MessageController.getMessage);
 module.exports = router;
