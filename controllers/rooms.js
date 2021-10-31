@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Rooms = require("../models/Rooms");
+const mongoose = require('mongoose');
 
 const addRoom = async (req, res, next) => {
     try {
@@ -10,7 +11,11 @@ const addRoom = async (req, res, next) => {
           .json({ error: { message: "User was not login!!!" } });
         }
         const name = req.body.NameGroup
-        const users = req.body.ListUsers
+        const ListUsers = req.body.ListUsers
+        let users =[];
+        for( let i=0 ; i< ListUsers.length ; i++){
+          users.push(mongoose.Types.ObjectId(ListUsers[i]))
+        }
         users.push(foundUser._id);
         const newRoom = new Rooms({
           name,
@@ -39,6 +44,40 @@ const getRoomAfterLogin = async (req, res, next) => {
         next(err)
       }
 }
+const getRoomFriend = async (req, res, next) => {
+  try {
+      const foundUser = await User.findOne({ _id: req.payload.userId });
+      if (!foundUser){
+        return res
+        .status(403)
+        .json({ error: { message: "User was not login!!!" } });
+      }
+      const Room = await Rooms.find({
+        users: { $in: [foundUser._id] },
+        group: false
+      });
+      res.status(200).json(Room);
+    } catch (err) {
+      next(err)
+    }
+}
+const getRoomGroup = async (req, res, next) => {
+  try {
+      const foundUser = await User.findOne({ _id: req.payload.userId });
+      if (!foundUser){
+        return res
+        .status(403)
+        .json({ error: { message: "User was not login!!!" } });
+      }
+      const Room = await Rooms.find({
+        users: { $in: [foundUser._id] },
+        group: true
+      });
+      res.status(200).json(Room);
+    } catch (err) {
+      next(err)
+    }
+}
 const getRoomByUserId = async (req, res, next) => {
   try {
       const foundUser = await User.findOne({ _id: req.payload.userId });
@@ -55,7 +94,7 @@ const getRoomByUserId = async (req, res, next) => {
       }
       else {
         const Room = await Rooms.find({
-          users: { $in: [req.params.userId] },
+          users: { $in: [foundUser._id] },
         });
         res.status(200).json(Room);
       }
@@ -159,6 +198,10 @@ const addMember = async (req, res, next) => {
   try {
     const id = req.body.id
     const list_user_id =req.body.list_user_id
+    let list_user = []
+    for( let i=0 ; i< list_user_id.length ; i++){
+      list_user.push(mongoose.Types.ObjectId(list_user_id[i]))
+    }
     const foundUser = await User.findOne({ _id: req.payload.userId });
     if (!foundUser){
       return res
@@ -173,7 +216,7 @@ const addMember = async (req, res, next) => {
       {
         $addToSet: {
           users: {
-            $each: list_user_id
+            $each: list_user
           }
         }
       })
@@ -192,5 +235,7 @@ module.exports = {
     getRoomAfterLogin,
     getRoomByUserId,
     addMember,
-    exitRoom
+    exitRoom,
+    getRoomFriend,
+    getRoomGroup
   }

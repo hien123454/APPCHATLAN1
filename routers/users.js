@@ -1,6 +1,6 @@
 const express = require("express");
-// const router = express.Router()
-const router = require("express-promise-router")();
+const router = express.Router()
+//const router = require("express-promise-router")();
 const { verifyAccessToken } = require("../helpers/jwt.service");
 const UserController = require("../controllers/users");
 
