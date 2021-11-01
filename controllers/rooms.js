@@ -8,7 +8,7 @@ const addRoom = async (req, res, next) => {
         if (!foundUser){
           return res
           .status(403)
-          .json({ error: { message: "User was not login!!!" } });
+          .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
         }
         const name = req.body.NameGroup
         const ListUsers = req.body.ListUsers
@@ -34,7 +34,7 @@ const getRoomAfterLogin = async (req, res, next) => {
         if (!foundUser){
           return res
           .status(403)
-          .json({ error: { message: "User was not login!!!" } });
+          .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
         }
         const Room = await Rooms.find({
           users: { $in: [foundUser._id] },
@@ -50,7 +50,7 @@ const getRoomFriend = async (req, res, next) => {
       if (!foundUser){
         return res
         .status(403)
-        .json({ error: { message: "User was not login!!!" } });
+        .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
       }
       const Room = await Rooms.find({
         users: { $in: [foundUser._id] },
@@ -67,7 +67,7 @@ const getRoomGroup = async (req, res, next) => {
       if (!foundUser){
         return res
         .status(403)
-        .json({ error: { message: "User was not login!!!" } });
+        .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
       }
       const Room = await Rooms.find({
         users: { $in: [foundUser._id] },
@@ -84,7 +84,7 @@ const getRoomByUserId = async (req, res, next) => {
       if (!foundUser){
         return res
         .status(403)
-        .json({ error: { message: "User was not login!!!" } });
+        .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
       }
       if(foundUser._id == req.params.userId){
         const Room = await Rooms.find({
@@ -108,7 +108,7 @@ const getRoomById = async (req, res, next) => {
       if (!foundUser){
         return res
         .status(403)
-        .json({ error: { message: "User was not login!!!" } });
+        .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
       }
       const roomId = req.params.RoomID;
       const Room = await Rooms.findOne({
@@ -121,6 +121,12 @@ const getRoomById = async (req, res, next) => {
 }
 const getAllRooms = async (req, res, next) => {
   try {
+    const foundUser = await User.findOne({ _id: req.payload.userId });
+    if (!foundUser){
+      return res
+      .status(403)
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
+    }
     const rooms = await Rooms.find({});
     res.status(200).json({ rooms });
   } catch (error) {
@@ -133,13 +139,13 @@ const deleteRoom = async (req, res, next) => {
     if (!foundUser){
       return res
       .status(403)
-      .json({ error: { message: "User was not login!!!" } });
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
     }
     const roomId = req.params.RoomID;
     const Room = await Rooms.deleteOne({
       _id: roomId,
     });
-    res.status(200).json({message: "Room was successfully deleted",Room});
+    res.status(200).json({message: "Room đã được xóa",Room});
   } catch (err) {
     next(err)
   }
@@ -151,7 +157,7 @@ const exitRoom = async (req, res, next) => {
     if (!foundUser){
       return res
       .status(403)
-      .json({ error: { message: "User was not login!!!" } });
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
     }
     await Rooms.findOneAndUpdate(
       {
@@ -164,7 +170,7 @@ const exitRoom = async (req, res, next) => {
         }
       })
     const room = await Rooms.findOne({_id:id})
-    res.status(200).json({message: "exitRoom was successfully",room});
+    res.status(200).json({message: "Thoát khỏi Room thành công",room});
   } catch (err) {
     next(err)
   }
@@ -177,7 +183,7 @@ const updateRoom = async (req, res, next) => {
     if (!foundUser){
       return res
       .status(403)
-      .json({ error: { message: "User was not login!!!" } });
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
     }
     await Rooms.findOneAndUpdate(
       {
@@ -189,7 +195,7 @@ const updateRoom = async (req, res, next) => {
       }
     )
     const room = await Rooms.findOne({_id:id})
-    res.status(200).json({message: "updateRoom was successfully",room});
+    res.status(200).json({message: "Room đã được cập nhật ",room});
   } catch (err) {
     next(err)
   }
@@ -206,7 +212,7 @@ const addMember = async (req, res, next) => {
     if (!foundUser){
       return res
       .status(403)
-      .json({ error: { message: "User was not login!!!" } });
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
     }
     await Rooms.findOneAndUpdate(
       {
@@ -221,7 +227,7 @@ const addMember = async (req, res, next) => {
         }
       })
       const room = await Rooms.findOne({_id:id})
-    res.status(200).json({message: "addMember was successfully",room});
+    res.status(200).json({message: "Thêm Thành viên thành công",room});
   } catch (err) {
     next(err)
   }

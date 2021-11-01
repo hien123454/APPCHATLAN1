@@ -15,6 +15,10 @@ router
   .get(verifyAccessToken, UserController.GetUserAfterLogin);
 
   router
+  .route("/checkFriend/:userID")
+  .get(verifyAccessToken, UserController.checkFriend);
+
+  router
   .route("/GetUserByPhone")
   .get(verifyAccessToken, UserController.GetUserByPhone);
 

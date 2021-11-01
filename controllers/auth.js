@@ -14,11 +14,11 @@ const signIn = async (req, res, next) => {
       if (!user) {
         return res
           .status(403)
-          .json({ error: { message: "User not registered." } });
+          .json({ error: { message: "Số điện thoại này chưa đăng ký tài khoản" } });
       }
       const isValid = await user.isValidPassword(password);
       if (!isValid) {
-        return res.status(403).json({ error: { message: "Unauthorized !!!" } });
+        return res.status(403).json({ error: { message: "Sai Mật Khẩu !!!" } });
       }
       user.active = true;
       await user.save();
@@ -41,7 +41,7 @@ const signIn = async (req, res, next) => {
       if (foundUser)
         return res
           .status(403)
-          .json({ error: { message: "Phone is already in use." } });
+          .json({ error: { message: "Số điện thoại đã được sử dụng." } });
       // Generate a salt
       const salt = await bcrypt.genSalt(10);
       // Generate a password hash (salt + hash)
@@ -64,7 +64,7 @@ const signIn = async (req, res, next) => {
       const refreshToken = req.headers["refreshtoken"];
       console.log(req.headers);
       if (!refreshToken) {
-        return res.status(401).json({ message: "bad request" });
+        return res.status(401).json({ message: "không có refreshtoken" });
       }
       const { userId } = await verifyRefreshToken(refreshToken);
       const accessToken = await signAccessToken(userId);
@@ -79,15 +79,15 @@ const signIn = async (req, res, next) => {
       const refreshToken = req.headers["refreshtoken"];
       console.log(req.headers);
       if (!refreshToken) {
-        return res.status(401).json({ message: "bad request" });
+        return res.status(401).json({ message: "không có refreshtoken" });
       }
       const { userId } = await verifyRefreshToken(refreshToken);
       const user = await User.findById(userId);
       user.active = false;
       await user.save();
       client.del(userId.toString(), (err, reply) => {
-        if (err) return res.status(500).json({ message: "bad request" });
-        return res.status(200).json({ message: "Logout !!!!" });
+        if (err) return res.status(500).json({ message: "Lỗi không xác định" });
+        return res.status(200).json({ message: "Đăng xuất thành công !!!!" });
       });
     } catch (error) {
       next(error);
@@ -102,17 +102,17 @@ const signIn = async (req, res, next) => {
       if (!foundUser)
         return res
           .status(403)
-          .json({ error: { message: "User was not login!!!" } });
+          .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
       //Check password co ton tai khong
       const isValid = await foundUser.isValidPassword(password);
       if (!isValid) {
-        return res.status(403).json({ error: { message: "Unauthorized" } });
+        return res.status(403).json({ error: { message: "Password Không Đúng " } });
       }
       //Check password co giong khong
       if (password !== reEnterPassword) {
         return res
           .status(403)
-          .json({ error: { message: "Password Nhap Sai!!!" } });
+          .json({ error: { message: "Password Nhập Sai!!!" } });
       }
       // Generate a salt
       const salt = await bcrypt.genSalt(10);
@@ -134,7 +134,7 @@ const forgotPassword = async (req, res, next) => {
       if (Password !== reEnterPassword) {
         return res
           .status(403)
-          .send([{ message: "Password and reEnterpassword must be the same " }]);
+          .send([{ message: "Password and reEnterpassword Không giống nhau " }]);
       }
       const result = await verifyOtp(phone, code);
       if (result) {
@@ -150,7 +150,7 @@ const forgotPassword = async (req, res, next) => {
         await FoundUser.save();
         res
           .status(200)
-          .send([{ message: "Password has been updated ", FoundUser }]);
+          .send([{ message: "Password đã được cập nhật ", FoundUser }]);
       } else {
         res.status(400).send([
           {

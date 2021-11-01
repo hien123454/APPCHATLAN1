@@ -2,12 +2,11 @@ const Message = require("../models/Message");
 const User = require("../models/User");
 const addMessage = async (req, res, next) => {
   try {
-    console.log("vao ham chat");
     const foundUser = await User.findOne({ _id: req.payload.userId });
     if (!foundUser){
       return res
       .status(403)
-      .json({ error: { message: "User was not login!!!" } });
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
     }
   const {RoomId,text} = req.body;
   const savedMessage = await Message.create({ RoomId:RoomId ,text:text, sender: foundUser._id });
@@ -18,6 +17,12 @@ const addMessage = async (req, res, next) => {
 }
 const cancelMessage = async (req, res, next) => {
     try {
+      const foundUser = await User.findOne({ _id: req.payload.userId });
+     if (!foundUser){
+      return res
+      .status(403)
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
+    }
         const message = await Message.findOne({
             _id: req.params.messageId
         });
@@ -30,6 +35,12 @@ const cancelMessage = async (req, res, next) => {
 }
 const getMessage = async (req, res, next) => {
     try {
+      const foundUser = await User.findOne({ _id: req.payload.userId });
+    if (!foundUser){
+      return res
+      .status(403)
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
+    }
         const messages = await Message.find({
             RoomId: req.params.RoomID,
         });

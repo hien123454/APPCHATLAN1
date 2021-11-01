@@ -8,7 +8,7 @@ const getListSenderRequest = async (req, res, next) => {
         if (!foundUser){
           return res
           .status(403)
-          .json({ error: { message: "User was not login!!!" } });
+          .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
         }
         const userRequest = await UserRequest.find({
             sender: foundUser._id,
@@ -25,7 +25,7 @@ const getListReceiver = async (req, res, next) =>{
         if (!foundUser){
           return res
           .status(403)
-          .json({ error: { message: "User was not login!!!" } });
+          .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
         }
         const userRequest = await UserRequest.find({
             receiver: foundUser._id,
@@ -35,8 +35,29 @@ const getListReceiver = async (req, res, next) =>{
         next(err)
       }
 }
+const checkSendRequest = async (req, res, next) =>{
+  try {
+      const foundUser = await User.findOne({ _id: req.payload.userId });
+      if (!foundUser){
+        return res
+        .status(403)
+        .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
+      }
+      const userRequest = await UserRequest.findOne({
+          sender: foundUser._id,
+          receiver: req.params.userID,
+      });
+      if(userRequest){
+        return res.status(200).json({success : true});
+      }
+      return res.status(200).json({success: false});
+    } catch (err) {
+      next(err)
+    }
+}
 
 module.exports = {
     getListSenderRequest,
-    getListReceiver
+    getListReceiver,
+    checkSendRequest
 }
