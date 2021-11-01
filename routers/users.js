@@ -14,6 +14,10 @@ router
   .route("/GetUserAfterLogin")
   .get(verifyAccessToken, UserController.GetUserAfterLogin);
 
+  router
+  .route("/GetUserByPhone")
+  .get(verifyAccessToken, UserController.GetUserByPhone);
+
 router
   .route("/cancelSendedFriend")
   .post(verifyAccessToken, UserController.cancelSendedFriend);

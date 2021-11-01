@@ -178,6 +178,16 @@ const GetUserAfterLogin = async (req, res, next) => {
     next(error);
   }
 };
+const GetUserByPhone = async (req, res, next) => {
+  try {
+    const {phone} = req.body;
+    console.log("Hien nEk",phone );
+    const users = await User.find({phone})
+    res.status(200).json({ users });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   getAllUser,
   newUser,
@@ -189,5 +199,6 @@ module.exports = {
   cancelSendedFriend,
   acceptFriend,
   declineFriend,
-  GetUserAfterLogin
+  GetUserAfterLogin,
+  GetUserByPhone
 };
