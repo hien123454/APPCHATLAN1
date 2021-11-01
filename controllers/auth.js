@@ -95,6 +95,12 @@ const signIn = async (req, res, next) => {
   };
   const ChangePassword = async (req, res, next) => {
     try {
+      const foundUser = await User.findOne({ _id: req.payload.userId });
+      if (!foundUser){
+        return res
+        .status(403)
+        .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
+      }
       const { password, reEnterPassword, newPassword } = req.body;
       console.log(req.payload);
       // Check if there is a user with the same user
