@@ -20,7 +20,7 @@ router
 
   router
   .route("/GetUserByPhone")
-  .get(verifyAccessToken, UserController.GetUserByPhone);
+  .post(verifyAccessToken, UserController.GetUserByPhone);
 
 router
   .route("/cancelSendedFriend")
@@ -37,6 +37,10 @@ router
 router
   .route("/declineFriend")
   .post(verifyAccessToken, UserController.declineFriend);
+
+  router
+  .route("/deleteFriend")
+  .post(verifyAccessToken, UserController.deleteFriend);
 
 router
   .route("/:userID")

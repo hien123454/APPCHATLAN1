@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 
 const UserSchema = new Schema(
   {
-    username: {
+    name: {
       type: String,
       require: true,
       min: 3,
@@ -38,6 +38,12 @@ const UserSchema = new Schema(
       default: "",
     },
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    birthday:{
+      type: Date
+    },
+    gender:{
+      type:Boolean
+    }
   },
   { timestamps: true }
 );

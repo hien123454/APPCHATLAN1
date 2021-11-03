@@ -7,35 +7,62 @@ const {
   signRefreshToken,
   verifyRefreshToken,
 } = require("../helpers/jwt.service");
-const signIn = async (req, res, next) => {
-    try {
-      const { phone, password } = req.body;
-      const user = await User.findOne({ phone });
-      if (!user) {
-        return res
-          .status(403)
-          .json({ error: { message: "Số điện thoại này chưa đăng ký tài khoản" } });
-      }
-      const isValid = await user.isValidPassword(password);
-      if (!isValid) {
-        return res.status(403).json({ error: { message: "Sai Mật Khẩu !!!" } });
-      }
-      user.active = true;
-      await user.save();
-      const accessToken = await signAccessToken(user._id);
-      const refreshToken = await signRefreshToken(user._id);
-      res.setHeader("authorization", accessToken);
-      res.setHeader("refreshToken", refreshToken);
+// const signIn = async (req, res, next) => {
+//     try {
+//       const { phone, password } = req.body;
+//       const user = await User.findOne({ phone });
+//       if (!user) {
+//         return res
+//           .status(403)
+//           .json({ error: { message: "Số điện thoại này chưa đăng ký tài khoản" } });
+//       }
+//       const isValid = await user.isValidPassword(password);
+//       if (!isValid) {
+//         return res.status(403).json({ error: { message: "Sai Mật Khẩu !!!" } });
+//       }
+//       user.active = true;
+//       await user.save();
+//       const accessToken = await signAccessToken(user._id);
+//       const refreshToken = await signRefreshToken(user._id);
+//       res.setHeader("authorization", accessToken);
+//       res.setHeader("refreshToken", refreshToken);
   
-      return res.status(200).json({ success: true, accessToken, refreshToken });
-    } catch (error) {
-      next(error);
+//       return res.status(200).json({ success: true, accessToken, refreshToken ,user});
+//     } catch (error) {
+//       next(error);
+//     }
+//     // Assign a token
+//   };
+const signIn = async (req, res, next) => {
+  try {
+    const { phone, password } = req.body;
+    const user = await User.findOne({ phone });
+    if (!user) {
+      return res
+        .status(403)
+        .json({ error: { message: "User not registered." } });
     }
-    // Assign a token
-  };
+    const isValid = await user.isValidPassword(password);
+    if (!isValid) {
+      return res.status(403).json({ error: { message: "Unauthorized !!!" } });
+    }
+    user.active = true;
+    await user.save();
+    const accessToken = await signAccessToken(user._id);
+    const refreshToken = await signRefreshToken(user._id);
+    res.setHeader("authorization", accessToken);
+    res.setHeader("refreshToken", refreshToken);
+
+    return res.status(200).json({ success: true, accessToken, refreshToken, user });
+  } catch (error) {
+    next(error);
+  }
+  // Assign a token
+};
   const signUp = async (req, res, next) => {
     try {
-      const { username, phone, password } = req.value.body;
+      console.log("AAAAAAAAA");
+      const { name, phone, password } = req.value.body;
       // Check if there is a user with the same user
       const foundUser = await User.findOne({ phone });
       if (foundUser)
@@ -50,7 +77,7 @@ const signIn = async (req, res, next) => {
       const newPassword = passwordHashed;
       // Create a new user
       const newUser = await User.create({
-        username,
+        name,
         phone,
         password: newPassword,
       });
@@ -95,12 +122,6 @@ const signIn = async (req, res, next) => {
   };
   const ChangePassword = async (req, res, next) => {
     try {
-      const foundUser = await User.findOne({ _id: req.payload.userId });
-      if (!foundUser){
-        return res
-        .status(403)
-        .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
-      }
       const { password, reEnterPassword, newPassword } = req.body;
       console.log(req.payload);
       // Check if there is a user with the same user

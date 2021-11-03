@@ -24,7 +24,7 @@ const getUser = async (req, res, next) => {
   try {
     const id = req.params.userID;
     console.log("Hien nEk",id );
-    const users = await User.findById({ _id: id })
+    const users = await User.findOne({ _id: id })
     res.status(200).json({ users });
   } catch (error) {
     next(error);
@@ -67,7 +67,7 @@ const requestAddFriend = async (req, res, next) => {
       return res
         .status(403)
         .json({ error: { message: "Người dùng chưa đăng nhập" } });
-    if (foundUser._id === id_UserWantAdd) {
+    if (foundUser._id == id_UserWantAdd) {
       return res
         .status(400)
         .json({ error: "Bạn không thể gửi yêu cầu kết bạn cho chính mình" });
@@ -237,6 +237,36 @@ const checkFriend = async (req, res, next) =>{
     next(err)
   }
 }
+const deleteFriend = async (req, res, next) =>{
+  try {
+    const foundUser = await User.findOne({ _id: req.payload.userId });
+    if (!foundUser){
+      return res
+      .status(403)
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
+    }
+    const userRequest = await User.findOneAndUpdate({
+        _id: req.payload.userId,
+        friends:{ $in:[req.body.friendId]},
+    },
+    {
+      $pull: {
+        friends: { $in: [req.body.friendId] }
+      }
+    });
+    const Room = await Rooms.deleteOne({
+      users: { $all: [req.payload.userId,req.body.friendId] },
+    });
+    if(userRequest && Room){
+      return res.status(200).json({userRequest,Room});
+    }
+    return res
+      .status(500)
+      .json({ error: { message: "Lỗi Không xóa được." } });
+  } catch (err) {
+    next(err)
+  }
+}
 module.exports = {
   getAllUser,
   newUser,
@@ -250,5 +280,6 @@ module.exports = {
   declineFriend,
   GetUserAfterLogin,
   GetUserByPhone,
-  checkFriend
+  checkFriend,
+  deleteFriend
 };

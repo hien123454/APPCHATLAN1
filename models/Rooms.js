@@ -6,6 +6,7 @@ const RoomSchema = Schema(
     name: String,
     users: Array,
     group: Boolean,
+    avatar:String
   },
   { timestamps: true }
 );

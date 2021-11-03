@@ -41,7 +41,7 @@ const schemas = {
   }),
 
   authSignUpSchema: Joi.object().keys({
-    username: Joi.string().min(2).required(),
+    name: Joi.string().min(2).required(),
     phone: Joi.string()
       .regex(/((09|03|07|08|05)+([0-9]{8})\b)/)
       .required(),
