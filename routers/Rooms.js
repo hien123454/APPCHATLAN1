@@ -11,6 +11,7 @@ router.get("/getRoomFriend", verifyAccessToken, RoomController.getRoomFriend);
 
 router.get("/getRoomGroup", verifyAccessToken, RoomController.getRoomGroup);
 
+router.post("/removeMember", verifyAccessToken, RoomController.removeMember);
 //new room
 router.post("/addRoom", verifyAccessToken, RoomController.addRoom);
 //get Room by RoomID

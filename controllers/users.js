@@ -152,6 +152,17 @@ const acceptFriend = async (req, res, next) => {
     const chunkData = FilterUserData(sender);
     await UserRequest.deleteOne({ _id: req.body.requestId });
     const listUsers = [currentUser._id, sender._id];
+    const checkRoom = await Rooms.findOne({users :{ $all: [currentUser._id, sender._id] }, group: false})
+    if(checkRoom){
+      await Rooms.findOneAndUpdate({
+        users :{ $all: [currentUser._id, sender._id] }, group: false
+      },{
+        active:true,
+      })
+      return res
+      .status(200)
+      .json({ message: "Yêu cầu kết bạn được chấp nhận", user: chunkData });
+    }
     const room = await Rooms.create({ users: listUsers, group: false });
     res
       .status(200)
@@ -254,8 +265,20 @@ const deleteFriend = async (req, res, next) =>{
         friends: { $in: [req.body.friendId] }
       }
     });
-    const Room = await Rooms.deleteOne({
+    const userRequest1 = await User.findOneAndUpdate({
+      _id: req.body.friendId,
+      friends:{ $in:[req.payload.userId]},
+  },
+  {
+    $pull: {
+      friends: { $in: [req.payload.userId] }
+    }
+  });
+    const Room = await Rooms.findOneAndUpdate({
       users: { $all: [req.payload.userId,req.body.friendId] },
+      group:false,
+    },{
+      active:false
     });
     if(userRequest && Room){
       return res.status(200).json({userRequest,Room});

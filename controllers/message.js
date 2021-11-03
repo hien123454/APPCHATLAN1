@@ -1,5 +1,6 @@
 const Message = require("../models/Message");
 const User = require("../models/User");
+const Rooms = require("../models/Rooms");
 const addMessage = async (req, res, next) => {
   try {
     const foundUser = await User.findOne({ _id: req.payload.userId });
@@ -9,8 +10,12 @@ const addMessage = async (req, res, next) => {
       .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
     }
   const {RoomId,text} = req.body;
-  const savedMessage = await Message.create({ RoomId:RoomId ,text:text, sender: foundUser._id });
-    res.status(200).json(savedMessage);
+  const room = await Rooms.findOne({ _id: RoomId }); 
+  if(room.friends == true){
+    const savedMessage = await Message.create({ RoomId:RoomId ,text:text, sender: foundUser._id });
+    return res.status(200).json(savedMessage);
+  }
+  res.status(401).json({message:"Không thể Gửi được tin nhắn"});
   } catch (err) {
     next(err)
   }

@@ -21,6 +21,7 @@ const addRoom = async (req, res, next) => {
           name,
           users,
           group: true,
+          roomMaster:foundUser._id
         });
         const saveRoom = await newRoom.save();
         res.status(200).json(saveRoom);
@@ -144,8 +145,12 @@ const deleteRoom = async (req, res, next) => {
     const roomId = req.params.RoomID;
     const Room = await Rooms.deleteOne({
       _id: roomId,
+       roomMaster:foundUser._id
     });
-    res.status(200).json({message: "Room đã được xóa",Room});
+    if(Room){
+      return res.status(200).json({message: "Room đã được xóa",Room});
+    }
+    res.status(403).json({message: "Chỉ chủ phòng mới được phép xóa"});
   } catch (err) {
     next(err)
   }
@@ -179,6 +184,7 @@ const updateRoom = async (req, res, next) => {
   try {
     const id = req.params.RoomID
     const name = req.body.name
+    const avatar = req.body.avatar
     const foundUser = await User.findOne({ _id: req.payload.userId });
     if (!foundUser){
       return res
@@ -191,7 +197,8 @@ const updateRoom = async (req, res, next) => {
         users: { $in: [foundUser._id] }
       },
       {
-        name: name
+        name: name,
+        avatar:avatar
       }
     )
     const room = await Rooms.findOne({_id:id})
@@ -232,6 +239,32 @@ const addMember = async (req, res, next) => {
     next(err)
   }
 }
+const removeMember = async (req, res, next) => {
+  try {
+    const {id,userWantRemove} = req.body
+    const foundUser = await User.findOne({ _id: req.payload.userId });
+    if (!foundUser){
+      return res
+      .status(403)
+      .json({ error: { message: "Người dùng chưa đăng nhập!!!" } });
+    }
+    await Rooms.findOneAndUpdate(
+      {
+        _id: id,
+        roomMaster:foundUser._id
+      },
+      {
+        $pull: {
+          users: { $in: [userWantRemove] }
+        }
+      })
+    const room = await Rooms.findOne({_id:id})
+    res.status(200).json({message: "Thoát khỏi Room thành công",room});
+  } catch (err) {
+    next(err)
+  }
+}
+
 module.exports = {
     addRoom,
     getAllRooms,
@@ -243,5 +276,6 @@ module.exports = {
     addMember,
     exitRoom,
     getRoomFriend,
-    getRoomGroup
+    getRoomGroup,
+    removeMember
   }

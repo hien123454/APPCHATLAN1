@@ -6,7 +6,15 @@ const RoomSchema = Schema(
     name: String,
     users: Array,
     group: Boolean,
-    avatar:String
+    avatar:String,
+    active:{
+      type: Boolean,
+      default: true,
+    },
+    roomMaster:{
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    }
   },
   { timestamps: true }
 );
